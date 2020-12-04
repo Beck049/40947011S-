@@ -1,43 +1,131 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
+#define RED "\x1b[;31;1m"
+
+#define BLU "\x1b[;34;1m"
+
+#define YEL "\x1b[;33;1m"
+
+#define GRN "\x1b[;32;1m"
+
+#define CYAN "\x1b[;36;1;3m"
+
+#define RESET "\x1b[0;m"
+
+
+int round = 1;
+/////////////////////////////////////////////////////
+int response(int *an,int *gus)
+{
+//find A
+	int a = 0;
+	for(int i = 0; i < 4; i++)
+	{
+		if(an[i] == gus[i])
+		{
+			a++;
+		}
+	}
+printf("%d\n",a);
+//find B
+	int b = 0;
+	for(int i = 0; i < 4; i++)
+	{
+		for(int j = 0; j < 4; j++)
+		{
+			if(an[i] == gus[j])
+			{
+				b++;
+			}
+		}
+	}
+printf("%d\n",b);
+	b = b-a;
+printf("%d\n",b);
+	if(a == 4)
+	{
+		printf(YEL"Response: Bingo! Congradulations."RESET);
+		return 1;
+	}
+	else
+	{
+		printf("Response: %d A %d B\n",a,b);
+		return 0;
+	}
+}
+//////////////////////////////////////////////////////////
+int check(int *gus)
+{
+	for(int i = 0; i < 4; i++)
+	{
+		for(int j = 0; j < i; j++)
+		{
+			if(gus[i] == gus[j])
+			{
+				printf(RED"Response: Invalid Guess\n"RESET);
+				return 1;
+			}
+		}
+	}	
+	return 0;
+}
+//////////////////////////////////////////////////////////
 int main()
 {
-    int r,n;
-    double ans;
+    int ans[] = {1,7,5,4,3,6,2,0,9,8};
 
-    printf("Please enter the resistance (1-100) : ");
-    scanf("%d",&r);
-    printf("Please enter n (1-100) : ");
-    scanf("%d",&n);
+    srand(time(NULL));
+//set answer and check
 
-    if(r <= 0)
+	for(int i = 0; i < 10; i++)
+	{
+		int r1,r2;
+		r1 = rand()%10;
+		r2 = rand()%8;
+		int temp;
+		temp = ans[r1];
+		ans[r1] = ans[r2];
+		ans[r2] = temp;
+	}
+	
+	int an[4];
+	for(int i = 0; i < 4; i++)
+	{
+		an[i] = ans[i];
+		printf("%d ",an[i]);
+	}
+
+    printf(CYAN"Bulls and Cows Game\n"RESET);
+
+	int input;
+    int gus[4];
+    int error = 0;
+    int stop2 = 0;
+//start round
+    while(stop2 != 1)
     {
-        printf("resistance must between 1 and 100");
-        return 0;
-    }
-    if(n <= 0)
-    {
-        printf("n must between 1 and 100");
-        return 0;
-    }
+        printf("Round %d >>> \n\tYour Guess:",round);
+        scanf("%d",&input);
+		for(int i = 3; i >= 0; i--)
+		{
+			gus[i] = input % 10;
+			input = input / 10;	
+		}
 
-    double r1[2] = {1,1};
-    double r2[2] = {1,1};
-    double r3[2] = {r,1};
+		error = check(gus);
 
-    for(int i = 1; i < n; i++)
-    {
-        r1[0] = r3[1];
-        r1[1] = r3[1]+r3[0];
-        r2[0] = r1[1];
-        r2[1] = r1[1]+r1[0];
-        r3[0] = r2[0];
-        r3[1] = r2[1];
+		if(error == 1)
+		{
+			stop2 = 0;
+		}
+		else if(error == 0)
+		{
+			stop2 = response(ans, gus);
+		}
+		round++;
     }
 
-
-    ans = ( r3[0]+r3[1] ) / r3[1];
-
-    printf("Ans: %lf\n",ans);
-  printf("Ans: %.0lf / %.0lf\n",r3[0]+r3[1],r3[1]);
+    return 0;
 }
